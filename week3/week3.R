@@ -48,9 +48,11 @@ xbar <- mean(m_new$Budget, na.rm = TRUE)
 # a) Modify the following command to create a side-by-side boxplot of the Budget separated by Ratings. 
 boxplot(m_new$Budget~m_new$Rating, xlab="Ratings", ylab= "In Million USD", main="Budget")
 # b) Overall which Rating tends to have the highest budget? 
+# PG
 # c) Specify the name of the statistic
 
 
 # Step 8. To compare review scores from Rotten Tomatoes and Metacritic, 
 # construct a side-by-side boxplot of two quantitative variables. 
 # State one similarity and one difference between the two distributions. 
+
