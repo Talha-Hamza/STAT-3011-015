@@ -4,14 +4,21 @@
 m_new <- read.delim("http://users.stat.umn.edu/~parky/movies2009new.txt")
 # Step 2. 
 # a) Use table( ) to construct a frequency table of Rating.
+table(m_new$Rating)
 # b) How many movies are PG? 
+# 29
 # c) How many are R? 
+# 39
 # d) How many movies are in total? 
+# 129
 # e) What proportion of them are PG-13? 
+# 57/129
 
 # Step 3. 
-# a) Make a histogram of Budget using hist() with breaks = 15. 
+# a) Make a histogram of Budget using hist() with breaks = 15.
+hist(m_new$Budget, breaks = 15)
 # b) Construct a boxplot() to observe the overall distribution of the Budget. 
+
 # c) What is the shape of the distribution? Are there any outliers? 
 # d) Which of the plots (histogram or boxplot) is easier to identify outliers? 
 
