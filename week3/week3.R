@@ -55,4 +55,4 @@ boxplot(m_new$Budget~m_new$Rating, xlab="Ratings", ylab= "In Million USD", main=
 # Step 8. To compare review scores from Rotten Tomatoes and Metacritic, 
 # construct a side-by-side boxplot of two quantitative variables. 
 # State one similarity and one difference between the two distributions. 
-
+boxplot(m_new$RT, m_new$Metacritic, names = c("Rotten Tomatoes", "Metacritic"))
