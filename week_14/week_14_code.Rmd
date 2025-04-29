@@ -1,0 +1,201 @@
+---
+title: "Week_14"
+output:
+  pdf_document: default
+  html_document: default
+date: "2025-04-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+In this problem, we will use a dataset named **`crime2005`** available through an R package called **`smss`** (Statistical Methods For The Social Sciences).
+
+### **Install the Packages (Needed Once)**
+
+We need to install the package before importing and using it. This only needs to be done once before the first use.
+
+```{r}
+# Run this in R Console (not in R Markdown)
+install.packages("smss")
+```
+
+## Import the Packages
+
+We will import the package into the R environment each time before using it.
+
+```{r}
+library(smss)
+```
+
+### **Import Dataset from Packages**
+
+We can import the dataset from the package using the **`data()`** function.
+
+```{r}
+data("crime2005")  # Load crime2005 dataset from smss package
+```
+
+Explore the dataset by showing it in a new window in RStudio.
+
+```{r}
+View(crime2005)
+```
+
+In R, we use "\~" for response-explanatory relationships:
+
+-   Format: **`response_variable ~ explanatory_variable`**
+
+-   For simple linear regression: **`y ~ x`**
+
+Make a scatter plot and find the correlation between VI2 and HS. Interpret the results and identify any outliers.
+
+### **Scatterplot**
+
+```{r}
+plot(VI2 ~ HS, 
+     xlab = "Proportion of High School Graduates",
+     ylab = "Number of Reported Violent Crimes per 10,000",
+     data = crime2005,
+     main = "Scatterplot of Crime Rate vs. HS Graduates")
+```
+
+### **Correlation**
+
+```{r}
+cor(crime2005$VI2, crime2005$HS)
+```
+
+**Interpretation:**\
+From the scatterplot and correlation of -0.325, there is a weak negative linear association between high school graduates and violent crime rate. There appears to be one clear outlier (Washington D.C.)
+
+## **Problem 2**
+
+Use **lm(y \~ x)'** to fit the linear regression model of HS and VI2. Find the following values from the output.
+
+```{r}
+mod <- lm(VI2 ~ HS, data = crime2005)
+summary(mod)
+```
+
+From the output:
+
+-   **y-intercept (a):** **`r coef(mod)[1]`**
+
+-   **slope (b):** **`r coef(mod)[2]`**
+
+-   **R-squared:** **`r summary(mod)$r.squared`**
+
+-   **Degrees of freedom (n-2):** **`r df.residual(mod)`** (where n = 51)
+
+## **Problem 3**
+
+What is the estimated regression equation? Interpret the y-intercept and slope?
+
+**Regression Equation:**
+
+From the model summary, **a = 231.25 (intercept), b = −2.1821**. Thus, the estimated regression equation is: `VI2 = 231.5−2.1821×(HS)`
+
+**Interpretation:**
+
+-   **y-Intercept:** If a state has 0 high school graduates, the average violent crime rate is expected to **231 (per 10,000 population).** As this is unrealistic, it is meaningless and is an example of why we shouldn't extrapolate beyond given data,
+
+-   **Slope:** For each 1% increase in HS graduates, violent crime decreases by **2.182** per 10,000 population
+
+## Problem 4
+
+Interpret R-squared.
+
+**Interpretation:** The R-squared value is 0.1059, meaning that 10.59% of the variation in violent crime rates (VI2) can be explained by its linear relationship with the percentage of high school graduates (HS). The remaining 89.41% of the variation is due to other factors not included in this model.
+
+## Problem 5
+
+Minnesota's percentage of high school graduates is 92.3. Find:
+
+1.  The predicted crime rate
+
+2.  The residual (observed - predicted)
+
+**Calculations:** 1. Predicted crime rate: $$ \widehat{VI2} = 231.2564 - 2.1821 \times 92.3 = 29.84 $$
+
+2.  From the dataset, Minnesota's actual violent crime rate is 26.3
+
+3.  Residual: $$ \text{Residual} = \text{Observed} - \text{Predicted} = 26.3 - 29.84 = -3.54 $$
+
+**R Code Verification:**
+
+```{r prob5, eval=FALSE}
+# Predicted value
+predict(mod, newdata = data.frame(HS = 92.3))
+# Actual value
+crime2005$VI2[crime2005$STATE == "MN"]
+# Residual
+residuals(mod)[crime2005$STATE == "MN"]
+```
+
+## **Problem 6**
+
+State three assumptions of simple linear regression and check each.
+
+1.  **Linearity Assumption**
+
+The relationship appears roughly linear aside from one outlier (DC).
+
+```{r}
+plot(VI2 ~ HS, data = crime2005)
+abline(mod)
+```
+
+2.  **Constant Variance Assumption**
+
+Residuals are roughly equally spread around the horizontal line except for the outlier.
+
+```{r}
+plot(mod, which = 1)
+```
+
+3.  **Normality Assumption**
+
+Points mostly follow the Q-Q line except for the outlier.
+
+```{r}
+plot(mod, which = 2)
+```
+
+## Problem 7
+
+Which of the following is FALSE?
+
+(A) If we calculate correlation between VI (violent crime rate per 100,000 population) and HS instead of VI2 (violent crime rate per 10,000 population), correlation will remain the same as the result from Problem 1.
+
+(B) If we remove Washington DC from the data set, then R-squared will increase.
+
+(C) From R-squared, we calculate r (correlation) by using r = √R².
+
+(D) All of the above are true.
+
+**Solution:**\
+The false statement is **(C)**.
+
+### Verification:
+
+```{r verification}
+# (A) Correlation remains nearly identical despite unit change
+cor_VI <- cor(crime2005$VI, crime2005$HS)
+cor_VI2 <- cor(crime2005$VI2, crime2005$HS)
+cor_check <- abs(cor_VI - cor_VI2) < 0.01  # Nearly identical
+
+# (B) Check R-squared change with and without DC. R-square WITHOUD DC should be larger
+mod_with_DC <- lm(VI2 ~ HS, data = crime2005)
+mod_no_DC <- lm(VI2 ~ HS, data = crime2005[crime2005$STATE != "DC",])
+r2_change <- summary(mod_no_DC)$r.squared > summary(mod_with_DC)$r.squared # TRUE
+
+# (C) Correlation should have the same sign as the slope
+r_in_c <-  sqrt(summary(mod_with_DC)$r.squared)
+correct_r <- sign(coef(mod_with_DC)[2]) * sqrt(summary(mod_with_DC)$r.squared)
+
+# r_in_c = 0.325 where as correct r is -0.325
+```
